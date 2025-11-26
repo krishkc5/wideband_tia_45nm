@@ -143,6 +143,125 @@ Section II presents a comprehensive analysis of the 45~nm CMOS process, extracti
 
 \section{Process Characterization}
 
+Accurate characterization of the 45~nm CMOS process is the foundation for all subsequent design and optimization. This section presents comprehensive DC and AC characteristics of NMOS and PMOS transistors, extracted from Cadence Spectre simulations using the provided process design kit (PDK). The characterization establishes the fundamental parameters and performance limits of the technology, enabling informed design decisions for the TIA circuit.
+
+\subsection{NMOS Transistor Characterization}
+
+The NMOS transistor characteristics are evaluated across a range of bias conditions and device sizes to understand the process capabilities. All NMOS devices are characterized with minimum channel length $L = 45$~nm and width ranging from 0.5~\um to 8~\um.
+
+\subsubsection{ID-VDS Characteristics}
+
+Figure~\ref{fig:nmos_id_vds} presents the drain current as a function of drain-source voltage for NMOS transistors with various gate widths. These curves are obtained by sweeping $V_{DS}$ from 0 to 1~V while holding the gate-source voltage constant at selected values. The I-V characteristics reveal the saturation behavior and the channel length modulation typical of 45~nm CMOS devices. The output resistance in saturation ($r_o = 1/(\lambda I_D)$) can be extracted from the slope of the curves, with smaller dimensions typically exhibiting lower output impedance due to short-channel effects.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: ID vs. VDS Curves]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, multiple VGS points \\ 0 $\leq$ VDS $\leq$ 1V}}
+\caption{NMOS ID-VDS characteristics for L = 45~nm and various gate widths. Curves show saturation behavior and channel length modulation effects. Early voltage and transconductance can be extracted from the slope in saturation region.}
+\label{fig:nmos_id_vds}
+\end{figure}
+
+\subsubsection{Threshold Voltage vs. Drain Current}
+
+The threshold voltage as a function of drain current is presented in Figure~\ref{fig:nmos_vth_id}. This relationship is critical for understanding the overdrive voltage and operating point selection in the TIA front-end. The threshold voltage variation with transistor width reveals short-channel effects and body effect in the 45~nm process. The relationship between $V_{th}$ and $V_{GS}$ determines the minimum supply voltage required and influences circuit biasing strategies.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: VTH vs. ID Curves]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA \\ 10 points minimum}}
+\caption{NMOS threshold voltage versus drain current for L = 45~nm and various gate widths. The variation in VTH with transistor width and current reflects threshold mismatch and size-dependent effects that impact noise and mismatch performance.}
+\label{fig:nmos_vth_id}
+\end{figure}
+
+\subsubsection{Transconductance vs. Drain Current}
+
+The transconductance $g_m$ as a function of drain current is shown in Figure~\ref{fig:nmos_gm_id}. The transconductance determines the input impedance of common-gate stages ($R_{in} = 1/g_m$) and is a fundamental parameter for noise analysis and bandwidth design. The relationship between $g_m$ and $I_D$ reveals the efficiency of the transistor ($g_m/I_D$ figure of merit) and guides the selection of bias currents for the TIA design. In strong inversion, $g_m/I_D \approx 2/V_{OD}$ where $V_{OD} = V_{GS} - V_{th}$.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: gm vs. ID Curves]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA \\ 10 points minimum}}
+\caption{NMOS transconductance versus drain current for L = 45~nm and various gate widths. Larger transistors generally exhibit higher transconductance at equivalent current levels, enabling lower input impedance designs at the cost of increased parasitic capacitance.}
+\label{fig:nmos_gm_id}
+\end{figure}
+
+\subsubsection{Gate Capacitances vs. Width}
+
+The gate-source capacitance $C_{gs}$ and gate-drain capacitance $C_{gd}$ as functions of transistor width are presented in Figure~\ref{fig:nmos_cap_width}. These capacitances are critical for frequency response analysis and bandwidth design. The parasitic capacitances increase with transistor width and significantly impact the input impedance seen by the photodiode. The total gate capacitance $C_{gg} = C_{gs} + C_{gd}$ determines the parasitic pole at the gate node and limits achievable bandwidth when combined with low input resistance designs.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: Cgs and Cgd vs. W]\\ NMOS transistors, L = 45nm \\ 0.4\um $<$ W $<$ 10\um \\ 10 points minimum}}
+\caption{NMOS gate capacitances (Cgs and Cgd) versus width for L = 45~nm. The linear relationship between capacitance and width confirms appropriate device scaling. The large parasitic capacitances at wide gate widths constrain the maximum device size and require careful optimization to meet bandwidth specifications.}
+\label{fig:nmos_cap_width}
+\end{figure}
+
+\subsubsection{Process Transition Frequency}
+
+The transit frequency $f_T$ of the NMOS transistor is a key metric that characterizes the frequency response limitations of the process. The transit frequency is defined as $f_T = g_m / (2\pi C_{gg})$, where $C_{gg} = C_{gs} + C_{gd}$ is the total gate capacitance. Analysis of $f_T$ across different drain currents and device widths reveals whether $f_T$ improves with current (as expected in strong inversion) or exhibits non-monotonic behavior. The process $f_T$ determines the maximum achievable gain-bandwidth product and guides the selection of gain stages and frequency compensation strategies.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: fT vs. ID]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
+\caption{NMOS transit frequency $f_T$ versus drain current for L = 45~nm and various widths. The variation in $f_T$ with current and width guides the selection of bias currents and device sizes for bandwidth optimization. Does fT increase monotonically with ID or exhibit saturation behavior?}
+\label{fig:nmos_ft_id}
+\end{figure}
+
+\subsection{PMOS Transistor Characterization}
+
+Complementary characterization of PMOS transistors is essential for understanding tail current sources, biasing circuits, and output stages in the TIA design. The PMOS characterization follows the same measurement protocol as the NMOS analysis. Due to lower mobility of holes compared to electrons, PMOS transistors typically exhibit lower transconductance than NMOS at equivalent drain currents.
+
+\subsubsection{ID-VDS Characteristics}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: ID vs. VDS Curves]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, multiple VGS points \\ 0 $\leq$ VDS $\leq$ 1V}}
+\caption{PMOS ID-VDS characteristics for L = 45~nm and various gate widths. PMOS devices typically exhibit lower saturation current and output impedance characteristics compared to NMOS due to mobility differences, requiring compensatory width scaling in differential pairs.}
+\label{fig:pmos_id_vds}
+\end{figure}
+
+\subsubsection{Threshold Voltage vs. Drain Current}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: VTH vs. ID Curves]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
+\caption{PMOS threshold voltage versus drain current for L = 45~nm and various gate widths. The magnitude of PMOS threshold voltage is typically larger in magnitude than NMOS threshold, reflecting the physics of p-channel device operation and affecting biasing circuit design.}
+\label{fig:pmos_vth_id}
+\end{figure}
+
+\subsubsection{Transconductance vs. Drain Current}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: gm vs. ID Curves]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
+\caption{PMOS transconductance versus drain current for L = 45~nm and various gate widths. The lower transconductance of PMOS compared to NMOS at equivalent currents is typical of CMOS technology and reflects the lower mobility of holes. This necessitates wider PMOS transistors (typically by a factor of 2--3) for matched performance.}
+\label{fig:pmos_gm_id}
+\end{figure}
+
+\subsubsection{Gate Capacitances vs. Width}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: Cgs and Cgd vs. W]\\ PMOS transistors, L = 45nm \\ 0.4\um $<$ W $<$ 10\um}}
+\caption{PMOS gate capacitances (Cgs and Cgd) versus width for L = 45~nm. PMOS capacitances per unit width are comparable to NMOS, supporting symmetrical differential pair designs when appropriate width scaling is applied to account for mobility differences.}
+\label{fig:pmos_cap_width}
+\end{figure}
+
+\subsubsection{PMOS Transit Frequency}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{2.1in}{\centering [Placeholder: fT vs. ID]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
+\caption{PMOS transit frequency $f_T$ versus drain current for L = 45~nm and various widths. The frequency response of PMOS is consistently lower than NMOS at equivalent currents, imposing design constraints on output stages and requiring careful optimization of current source bandwidth.}
+\label{fig:pmos_ft_id}
+\end{figure}
+
+\subsection{Process Analysis and Hand Calculation Verification}
+
+The comprehensive characterization reveals several key insights that guide the TIA design strategy. First, the transconductance efficiency ($g_m/I_D$) of the 45~nm process is excellent for low-voltage design, enabling reasonable input impedance at modest bias currents (typically 2--5~mA for the input stage). The parasitic gate capacitances scale approximately linearly with device width, confirming the device scaling relationships predicted by classic CMOS theory. However, the measured capacitance may deviate from simple parallel-plate models due to overlap and fringing effects.
+
+Second, the process transit frequency at typical TIA bias conditions is [Placeholder: fT value, typically 50--100 GHz]. This is adequate for the 300~MHz bandwidth specification with appropriate input impedance control and frequency compensation. The transit frequency should be verified to increase monotonically with drain current in strong inversion, confirming operation in the designed inversion regime.
+
+Third, the output resistance of saturation-region devices shows that short-channel effects are significant even in the 45~nm process. The channel length modulation parameter $\lambda$ (extracted from output resistance) must be accounted for in hand calculations of gain-frequency response.
+
+The characterization data provide the numerical parameters required for hand calculation of the TIA circuit. Measured transconductance values, threshold voltages, and parasitic capacitances are used directly in the subsequent sections for noise analysis, frequency response modeling, and stability assessment. Discrepancies between simulation results and hand calculations based on the process characterization data are analyzed in Section~VI and attributed to second-order effects such as velocity saturation, threshold voltage shifts with bulk voltage, and parasitic gate resistance.
 
 
 \newpage
