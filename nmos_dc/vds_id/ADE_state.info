@@ -1,0 +1,3 @@
+projectDir = '"~/simulation"
+designInfo = '("wideband_tia_45nm" "nmos_dc" "schematic" "spectre")
+descriptionText = "None"
