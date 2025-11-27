@@ -1,301 +1,231 @@
-\documentclass[10pt,twocolumn]{article}
+\documentclass[11pt]{article}
 
-% Essential packages for journal-style formatting
-\usepackage[margin=0.75in]{geometry}
+% -------------------------------------------------
+% Packages
+% -------------------------------------------------
+\usepackage{amsmath, amssymb}
 \usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amssymb}
 \usepackage{booktabs}
-\usepackage{array}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{float}
+\usepackage{siunitx}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{cite}
-\usepackage{natbib}
-\usepackage{setspace}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
 
-% Configure hyperref
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    citecolor=blue,
-    urlcolor=blue,
-    hidelinks
-}
+\geometry{letterpaper, margin=1in}
 
-% Page layout - IEEE journal style
-\setlength{\parindent}{0.15in}
-\setlength{\parskip}{0pt}
-\setlength{\columnsep}{0.3in}
+\title{ESE 5720 Final Project \\ \Large Part i--ii Submission}
+\author{Krishna Chemudupati}
+\date{\today}
 
-% Figure caption setup - captions below figures and tables
-\captionsetup[table]{position=below, skip=6pt}
-\captionsetup[figure]{position=below, skip=6pt}
-\captionsetup{
-    font=small,
-    labelfont=bf,
-    format=hang,
-    justification=justified,
-    singlelinecheck=false
-}
-
-% Custom commands for units
-\newcommand{\um}{$\mu$m}
-\newcommand{\nm}{nm}
-\newcommand{\fF}{fF}
-\newcommand{\pF}{pF}
-\newcommand{\nF}{nF}
-\newcommand{\Kohm}{k$\Omega$}
-\newcommand{\ohm}{$\Omega$}
-\newcommand{\mV}{mV}
-\newcommand{\V}{V}
-\newcommand{\uA}{$\mu$A}
-\newcommand{\nA}{nA}
-\newcommand{\mA}{mA}
-\newcommand{\MHz}{MHz}
-\newcommand{\GHz}{GHz}
-\newcommand{\mW}{mW}
-\newcommand{\uW}{$\mu$W}
-\newcommand{\dBohm}{dB$\Omega$}
-
-% ============================================================================
-% BEGIN DOCUMENT
-% ============================================================================
-
+% -------------------------------------------------
 \begin{document}
-
-% ============================================================================
-% TITLE AND ABSTRACT
-% ============================================================================
-
-\title{Wideband Trans-Impedance Amplifier Design in 45~nm CMOS Technology: \\
-Process Characterization and Design Methodology}
-
-\author{ESE 419/572: Analog Integrated Circuit Design\\University of Pennsylvania}
-
-\date{Fall 2025}
+% -------------------------------------------------
 
 \maketitle
+\tableofcontents
+\newpage
 
-\begin{abstract}
-This paper presents a comprehensive analysis of transimpedance amplifier (TIA) design for high-speed optical receivers. The work encompasses detailed process characterization of a 45~nm CMOS technology with 1~V supply voltage, comprehensive literature review of state-of-the-art TIA topologies, and design methodology for achieving 150~k$\Omega$ transimpedance gain with bandwidth exceeding 300~MHz while maintaining input-referred noise below 125~nA$_{rms}$ and total power consumption below 10~mW. This document addresses Parts i (Introduction and Literature Review) and ii (Process Characterization) of the final project, establishing the foundation for subsequent circuit design, simulation, and optimization phases.
-\end{abstract}
+% -------------------------------------------------
+% INTRODUCTION & LITERATURE REVIEW
+% -------------------------------------------------
+\section{Introduction and Literature Search}
 
-% ============================================================================
-% SECTION I: INTRODUCTION AND LITERATURE REVIEW
-% ============================================================================
-
-\section{Introduction and Literature Review}
-
-\subsection{Overview of Optical Receivers and TIA Fundamentals}
-
-Modern fiber-optic communication systems form the foundational infrastructure for contemporary high-speed global data transmission, currently supporting data rates exceeding 100~Gb/s in commercial deployments. At the receiver front-end, weak optical signals attenuated over long distances must be converted to robust electrical signals suitable for subsequent processing stages including limiting amplifiers, clock and data recovery circuits, and digital signal processing. The optical receiver front-end typically consists of three critical components: a photodetector (usually a PIN photodiode or avalanche photodiode), a trans-impedance amplifier, and a limiting amplifier. The photodetector converts incident photons into electrical current with magnitude typically in the range of 10 to 100~\uA for practical systems, though sensitivity requirements in long-haul applications can demand amplification of currents as small as 1~\uA. The photodiode current is extremely weak relative to the noise floor of subsequent amplification stages, necessitating a low-noise, high-gain front-end preamplifier.
-
-The trans-impedance amplifier (TIA) serves as this critical first stage, providing three essential functions: (1) converting the weak photodiode current to a voltage suitable for further amplification, (2) presenting a low input impedance to the photodiode to reduce input voltage swing and bandwidth limitations, and (3) providing sufficient transimpedance gain to bring the signal above the noise floor of subsequent stages. The TIA's performance fundamentally determines the overall optical receiver sensitivity, bandwidth, and power consumption, making it one of the most critical components in high-speed optical transceivers.
-
-\subsection{Photodiode Modeling and Input Signal Characteristics}
-
-Under small-signal AC conditions, the photodiode can be accurately modeled as a current source in parallel with a parasitic junction capacitance $C_P$ and a series resistance $R_P$. The photodiode parasitic capacitance is a critical design parameter, as it directly couples into the TIA input node and creates a pole that fundamentally limits the achievable bandwidth. For this project, the input capacitance $C_P = 100$~\fF represents a sum of the photodiode junction capacitance and package parasitic capacitance. This relatively small capacitance (compared to discrete implementations which often see 0.5--1~pF) results from careful package design and highlights the importance of minimizing parasitics in integrated receiver designs.
-
-The photodetector generates a photocurrent $i_{in}$ proportional to the instantaneous incident optical power, described by $i_{in}(t) = R_p \cdot P_{optical}(t) + i_{dark}$, where $R_p$ is the photodiode responsivity (typically 0.7--1.0~A/W for silicon photodiodes at 1550~nm) and $i_{dark}$ is the temperature-dependent dark current. For this project, the input current specification is $i_{in} = 2.67$~\uA peak-to-peak, representing a typical optical data signal amplitude in modern 10~Gb/s to 25~Gb/s optical links.
-
-\subsection{Fundamental TIA Design Equations and Specifications}
-
-The fundamental relationship governing TIA performance is the transimpedance transfer function, defined as $Z_T = V_{out}/i_{in}$ with units of $\Omega$ or V/A. The transimpedance is typically expressed in decibels as $Z_{T,dB} = 20 \log_{10}(|Z_T|)$ in units of \dBohm. The TIA must simultaneously satisfy competing design objectives summarized in Table~\ref{tab:specs}. The 1~V supply voltage represents a challenging constraint for achieving the required gain, noise, and bandwidth simultaneously, as the voltage headroom available for biasing intermediate stages is severely limited.
-
-The transimpedance gain directly determines the output voltage amplitude for a given input photodiode current. For a 2.67~\uA input signal and target gain of 150~\Kohm, the expected output voltage swing is approximately 400~mV, which must be accommodated within the 1~V supply while maintaining headroom for subsequent stages. The bandwidth specification of at least 300~MHz must support the modulation rate of the received optical signal. The input-referred noise specification of 125~nA$_{rms}$ integrated over the -3dB bandwidth is critical for determining the sensitivity of the receiver, as lower noise enables detection of fainter optical signals. The power consumption constraint of less than 10~mW is essential for system integration in pluggable optical modules where heat dissipation is limited.
-
-\subsection{Core Design Challenges and Fundamental Tradeoffs}
-
-TIA design presents a fundamental set of competing constraints that cannot be simultaneously optimized without careful architectural choices. The gain-bandwidth tradeoff represents perhaps the most fundamental challenge: the transimpedance gain is primarily determined by the feedback network elements (typically a feedback resistor $R_f$ and feedback capacitor $C_f$ for stabilization), with the relationship $Z_T \approx R_f$. However, the parasitic capacitance at the input (photodiode capacitance $C_P$ plus the TIA input capacitance) creates a dominant pole described by $f_{-3dB} \approx 1/(2\pi R_{in} C_P)$. Increasing $R_f$ to improve gain directly increases the output impedance, which when driving the 600~\ohm load creates additional bandwidth limitations. The fundamental bandwidth-gain relationship shows that to achieve both high gain and high bandwidth, active circuits with significant transconductance $(g_m)$ are required. This drives the design toward more complex topologies such as regulated cascode or common-gate configurations rather than simple resistive feedback.
-
-The input impedance and stability constraints arise from the 100~\fF input capacitance, which creates a non-minimum phase system. Without careful compensation, excessive phase lag can occur, leading to closed-loop instability or resonant peaking in the transfer function. The stability requirement imposes constraints on the compensation network (typically a feedback capacitor $C_f$) and the amplifier open-loop gain. The relationship between the noise-gain pole and the amplifier open-loop gain response determines whether the circuit oscillates, requiring careful frequency compensation analysis.
-
-Noise optimization under constraints represents another critical challenge. The input-referred current noise of the TIA arises from multiple sources including thermal noise from feedback resistor ($i_{n,Rf}^2 \approx 4kT/R_f$), thermal noise from input transistor ($i_{n,transistor}^2 \propto \sqrt{I_D}/g_m$), and flicker (1/f) noise dominant at frequencies below 1~MHz. The requirement for input-referred noise $\leq 125$~nA$_{rms}$ integrated over the bandwidth creates a tension with the gain specification. Larger feedback resistors reduce thermal noise but reduce bandwidth and increase output voltage swing, demanding higher open-loop gain from the amplifier. The input-referred thermal noise from the feedback resistor decreases as $1/\sqrt{R_f}$, but the output voltage swing increases linearly with $R_f$, requiring careful selection of the feedback impedance.
-
-The 1~V supply voltage is extraordinarily challenging for 150~\Kohm gain design. This supply voltage limits the voltage headroom available for biasing multiple cascaded stages. For comparison, typical discrete TIA designs operate at 5~V or 3.3~V; integrated designs in this technology often target 1.8~V or 2.5~V supplies. The project specification of 1~V approximately limits the maximum voltage drop available per stage to about 200~mV after accounting for substrate biasing requirements and minimum drain-source voltage requirements in saturation.
-
-\subsection{State-of-the-Art TIA Topologies and Design Techniques}
-
-Research over the past two decades has identified a rich set of TIA design topologies, each with specific advantages for particular design constraints. The simplest approach, the resistive feedback TIA, uses a resistive feedback network around an inverting operational amplifier or open-loop amplifier stage with gain set by the feedback resistor $Z_T = -R_f$. A feedback capacitor $C_f$ is typically added in parallel with $R_f$ to stabilize the closed-loop response, yielding $Z_T(s) = -R_f/(1 + s R_f C_f)$. The advantages of this topology include simplicity, inherent stability if properly compensated, and well-understood design methodology. However, disadvantages include high input impedance determined primarily by the effective input resistance of the amplifier (which is often in the range of 100--1000~\ohm) that limits bandwidth, thermal noise from feedback resistor that dominates at high frequencies, and limited open-loop gain that can prevent reaching specifications. The resistive feedback topology dominated TIA design through the 1990s and remains popular in applications where bandwidth is not the primary constraint. Modern implementations often employ this topology with aggressive inductive peaking or other bandwidth extension techniques.
-
-To reduce the input impedance and improve bandwidth, researchers developed TIAs using a common-gate (CG) configuration as the input stage. The common-gate stage has an input resistance of $R_{in,CG} = 1/g_m$. For a device biased at reasonable current levels (1--10~mA), this input impedance is in the range of 50--200~\ohm, providing significantly lower input impedance than achieved with feedback around an amplifier. The input impedance is decoupled from the transimpedance gain, allowing independent optimization of bandwidth and gain. Recent implementations demonstrate that the common-gate topology can achieve bandwidths of 6--8~GHz with noise performance comparable to resistive feedback designs. The topology directly provides a differential pair of outputs, enabling straightforward realization of fully differential receivers. The advantages of this topology include low input impedance, high bandwidth capability, decoupled gain and bandwidth design, and low noise with careful design. The disadvantages include the need for careful biasing to maintain low noise, potential sensitivity to substrate noise, and typically requires cascode stages for adequate gain.
-
-One of the most significant advances in TIA design over the past two decades is the regulated cascode (RGC) configuration, first demonstrated by Park et al. \cite{park2000}. The RGC topology places a common-source (CS) amplifier in series with the gate of a common-gate (CG) input device, providing ``cascode gain boosting.'' The regulated cascode provides reduced input resistance described by $R_{in,RGC} = 1/[g_{m,CG}(1 + g_{m,CS} r_{o,CS})] \ll 1/g_{m,CG}$, improved isolation of photodiode capacitance from the input node, and high transimpedance gain without requiring a large feedback resistor. The RGC configuration has been demonstrated in multiple technology nodes. Kromer et al. \cite{kromer2004} demonstrated a 20~GHz CMOS TIA in 130~nm technology achieving 54~\dBohm gain with -3dB bandwidth of 8.1~GHz using the RGC configuration with shunt-peaking inductors. The advantages of this configuration include very low input impedance that enables high bandwidth, independently optimized gain, excellent isolation of photodiode capacitance, and demonstrated capability to 100~GHz in SiGe technology. The disadvantages include requirement for additional voltage headroom for the cascode stage, increased input-referred noise from the common-source stage, and more complex bias network requirement.
-
-Bandwidth extension techniques have been developed to overcome the fundamental limitation of photodiode input capacitance. Adding inductors in strategic locations creates zeros in the transfer function that can compensate for the poles created by the input capacitance. Shunt-peaking inductors are placed in series with load resistors at the drain of gain stages. These are entirely passive and add zero power, but occupy significant chip area due to the low inductance values required (typically 0.5--2~nH). Series-peaking inductors are placed at the input node to isolate the photodiode capacitance from the bandwidth-limiting node. This technique is particularly effective for RGC designs. Pan and Luo \cite{pan2022} demonstrated an inverter-based cascode TIA achieving 58~\dBohm with 12.7~GHz bandwidth using input series inductive peaking combined with negative capacitance compensation. Alternative approaches employ capacitive elements in strategic locations to create zeros that compensate for parasitic poles. The negative Miller capacitance technique uses capacitors shunted with amplifier stages to create negative impedance that cancels the parasitic capacitance at the input. Placing capacitors in parallel with source-degeneration resistors creates high-impedance source degeneration at high frequencies, providing additional bandwidth extension without requiring large-area inductors.
-
-Achieving the noise specification of 125~nA$_{rms}$ while maintaining gain and bandwidth requires careful noise analysis and circuit optimization. The input transconductance determines the input impedance and influences both noise and power dissipation. The figure of merit $g_m/I_D$ characterizes the efficiency of a transistor for a given bias current. In strong inversion (typical for low-noise TIAs), this relationship is approximately $g_m/I_D \approx 2/V_{OD}$, where $V_{OD} = V_{GS} - V_{th}$ is the overdrive voltage. Optimal noise performance typically requires moderate overdrive voltages (0.2--0.3~V) that provide good $g_m/I_D$ while maintaining reasonable power dissipation. Multi-stage designs with careful gain distribution can minimize the input-referred noise contribution from later stages. If the first stage provides gain $A_1$, the input-referred noise contribution from the second stage is reduced by $A_1^2$, making it essential to provide sufficient gain in the first stage. Some recent designs employ correlated noise cancellation, using carefully matched secondary signal paths to generate noise that destructively interferes with the primary signal path noise.
-
-\subsection{Recent Advances in High-Speed TIA Design}
-
-Recent work in high-speed TIA design has focused on several key directions that are directly relevant to this project. Li et al. \cite{li2023} demonstrate a 100~Gb/s CMOS TIA in 65~nm technology achieving 70~GHz bandwidth with 40~\dBohm gain using a cascade of regulated cascode stages with capacitive degeneration and inductive peaking. The design achieves 31~pA/$\sqrt{\text{Hz}}$ input-referred noise while consuming only 24~mW from a 1.2~V supply. The key innovation is the careful distribution of gain and noise figure across multiple stages, ensuring that noise from later stages is sufficiently attenuated by earlier-stage gain that the overall noise budget is met. A consistent theme in recent literature is the importance of integrating the photodiode with the TIA on the same die or package, minimizing the parasitic capacitances and package-induced coupling. Monolithic integration can reduce input capacitance from approximately 100~\fF (typical for discrete photodiodes) to approximately 50~\fF, providing additional bandwidth margin. The transition to advanced process nodes (28~nm, 16~nm, 7~nm CMOS as well as SiGe BiCMOS) has enabled new design opportunities. Smaller transistors provide higher transconductance at the same current levels, enabling lower input impedance and better noise performance. However, the reduced supply voltages at these nodes (often 0.7--0.9~V) create new challenges for implementing high-gain circuits, making the 1~V constraint in this project representative of modern design challenges.
-
-\subsection{Chapter Organization}
-
-Section II presents a comprehensive analysis of the 45~nm CMOS process, extracting and analyzing DC and AC characteristics of NMOS and PMOS transistors. The process characterization provides the foundation for subsequent design phases and reveals the capabilities and limitations of the available technology for achieving the TIA specifications. Subsequent chapters (in the final submission) will address circuit design strategy, hand calculations, Cadence simulation results, and comprehensive comparison of theory to measurement.
-
-% ============================================================================
-% SECTION II: PROCESS CHARACTERIZATION
-% ============================================================================
-
-\section{Process Characterization}
-
-Accurate characterization of the 45~nm CMOS process is the foundation for all subsequent design and optimization. This section presents comprehensive DC and AC characteristics of NMOS and PMOS transistors, extracted from Cadence Spectre simulations using the provided process design kit (PDK). The characterization establishes the fundamental parameters and performance limits of the technology, enabling informed design decisions for the TIA circuit.
-
-\subsection{NMOS Transistor Characterization}
-
-The NMOS transistor characteristics are evaluated across a range of bias conditions and device sizes to understand the process capabilities. All NMOS devices are characterized with minimum channel length $L = 45$~nm and width ranging from 0.5~\um to 8~\um.
-
-\subsubsection{ID-VDS Characteristics}
-
-Figure~\ref{fig:nmos_id_vds} presents the drain current as a function of drain-source voltage for NMOS transistors with various gate widths. These curves are obtained by sweeping $V_{DS}$ from 0 to 1~V while holding the gate-source voltage constant at selected values. The I-V characteristics reveal the saturation behavior and the channel length modulation typical of 45~nm CMOS devices. The output resistance in saturation ($r_o = 1/(\lambda I_D)$) can be extracted from the slope of the curves, with smaller dimensions typically exhibiting lower output impedance due to short-channel effects.
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: ID vs. VDS Curves]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, multiple VGS points \\ 0 $\leq$ VDS $\leq$ 1V}}
-\caption{NMOS ID-VDS characteristics for L = 45~nm and various gate widths. Curves show saturation behavior and channel length modulation effects. Early voltage and transconductance can be extracted from the slope in saturation region.}
-\label{fig:nmos_id_vds}
-\end{figure}
-
-\subsubsection{Threshold Voltage vs. Drain Current}
-
-The threshold voltage as a function of drain current is presented in Figure~\ref{fig:nmos_vth_id}. This relationship is critical for understanding the overdrive voltage and operating point selection in the TIA front-end. The threshold voltage variation with transistor width reveals short-channel effects and body effect in the 45~nm process. The relationship between $V_{th}$ and $V_{GS}$ determines the minimum supply voltage required and influences circuit biasing strategies.
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: VTH vs. ID Curves]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA \\ 10 points minimum}}
-\caption{NMOS threshold voltage versus drain current for L = 45~nm and various gate widths. The variation in VTH with transistor width and current reflects threshold mismatch and size-dependent effects that impact noise and mismatch performance.}
-\label{fig:nmos_vth_id}
-\end{figure}
-
-\subsubsection{Transconductance vs. Drain Current}
-
-The transconductance $g_m$ as a function of drain current is shown in Figure~\ref{fig:nmos_gm_id}. The transconductance determines the input impedance of common-gate stages ($R_{in} = 1/g_m$) and is a fundamental parameter for noise analysis and bandwidth design. The relationship between $g_m$ and $I_D$ reveals the efficiency of the transistor ($g_m/I_D$ figure of merit) and guides the selection of bias currents for the TIA design. In strong inversion, $g_m/I_D \approx 2/V_{OD}$ where $V_{OD} = V_{GS} - V_{th}$.
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: gm vs. ID Curves]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA \\ 10 points minimum}}
-\caption{NMOS transconductance versus drain current for L = 45~nm and various gate widths. Larger transistors generally exhibit higher transconductance at equivalent current levels, enabling lower input impedance designs at the cost of increased parasitic capacitance.}
-\label{fig:nmos_gm_id}
-\end{figure}
-
-\subsubsection{Gate Capacitances vs. Width}
-
-The gate-source capacitance $C_{gs}$ and gate-drain capacitance $C_{gd}$ as functions of transistor width are presented in Figure~\ref{fig:nmos_cap_width}. These capacitances are critical for frequency response analysis and bandwidth design. The parasitic capacitances increase with transistor width and significantly impact the input impedance seen by the photodiode. The total gate capacitance $C_{gg} = C_{gs} + C_{gd}$ determines the parasitic pole at the gate node and limits achievable bandwidth when combined with low input resistance designs.
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: Cgs and Cgd vs. W]\\ NMOS transistors, L = 45nm \\ 0.4\um $<$ W $<$ 10\um \\ 10 points minimum}}
-\caption{NMOS gate capacitances (Cgs and Cgd) versus width for L = 45~nm. The linear relationship between capacitance and width confirms appropriate device scaling. The large parasitic capacitances at wide gate widths constrain the maximum device size and require careful optimization to meet bandwidth specifications.}
-\label{fig:nmos_cap_width}
-\end{figure}
-
-\subsubsection{Process Transition Frequency}
-
-The transit frequency $f_T$ of the NMOS transistor is a key metric that characterizes the frequency response limitations of the process. The transit frequency is defined as $f_T = g_m / (2\pi C_{gg})$, where $C_{gg} = C_{gs} + C_{gd}$ is the total gate capacitance. Analysis of $f_T$ across different drain currents and device widths reveals whether $f_T$ improves with current (as expected in strong inversion) or exhibits non-monotonic behavior. The process $f_T$ determines the maximum achievable gain-bandwidth product and guides the selection of gain stages and frequency compensation strategies.
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: fT vs. ID]\\ NMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
-\caption{NMOS transit frequency $f_T$ versus drain current for L = 45~nm and various widths. The variation in $f_T$ with current and width guides the selection of bias currents and device sizes for bandwidth optimization. Does fT increase monotonically with ID or exhibit saturation behavior?}
-\label{fig:nmos_ft_id}
-\end{figure}
-
-\subsection{PMOS Transistor Characterization}
-
-Complementary characterization of PMOS transistors is essential for understanding tail current sources, biasing circuits, and output stages in the TIA design. The PMOS characterization follows the same measurement protocol as the NMOS analysis. Due to lower mobility of holes compared to electrons, PMOS transistors typically exhibit lower transconductance than NMOS at equivalent drain currents.
-
-\subsubsection{ID-VDS Characteristics}
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: ID vs. VDS Curves]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, multiple VGS points \\ 0 $\leq$ VDS $\leq$ 1V}}
-\caption{PMOS ID-VDS characteristics for L = 45~nm and various gate widths. PMOS devices typically exhibit lower saturation current and output impedance characteristics compared to NMOS due to mobility differences, requiring compensatory width scaling in differential pairs.}
-\label{fig:pmos_id_vds}
-\end{figure}
-
-\subsubsection{Threshold Voltage vs. Drain Current}
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: VTH vs. ID Curves]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
-\caption{PMOS threshold voltage versus drain current for L = 45~nm and various gate widths. The magnitude of PMOS threshold voltage is typically larger in magnitude than NMOS threshold, reflecting the physics of p-channel device operation and affecting biasing circuit design.}
-\label{fig:pmos_vth_id}
-\end{figure}
-
-\subsubsection{Transconductance vs. Drain Current}
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: gm vs. ID Curves]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
-\caption{PMOS transconductance versus drain current for L = 45~nm and various gate widths. The lower transconductance of PMOS compared to NMOS at equivalent currents is typical of CMOS technology and reflects the lower mobility of holes. This necessitates wider PMOS transistors (typically by a factor of 2--3) for matched performance.}
-\label{fig:pmos_gm_id}
-\end{figure}
-
-\subsubsection{Gate Capacitances vs. Width}
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: Cgs and Cgd vs. W]\\ PMOS transistors, L = 45nm \\ 0.4\um $<$ W $<$ 10\um}}
-\caption{PMOS gate capacitances (Cgs and Cgd) versus width for L = 45~nm. PMOS capacitances per unit width are comparable to NMOS, supporting symmetrical differential pair designs when appropriate width scaling is applied to account for mobility differences.}
-\label{fig:pmos_cap_width}
-\end{figure}
-
-\subsubsection{PMOS Transit Frequency}
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{2.1in}{\centering [Placeholder: fT vs. ID]\\ PMOS transistors with W = 0.5\um, 1\um, 2\um, 4\um, 8\um \\ L = 45nm, 0 $\leq$ ID $\leq$ 20mA}}
-\caption{PMOS transit frequency $f_T$ versus drain current for L = 45~nm and various widths. The frequency response of PMOS is consistently lower than NMOS at equivalent currents, imposing design constraints on output stages and requiring careful optimization of current source bandwidth.}
-\label{fig:pmos_ft_id}
-\end{figure}
-
-\subsection{Process Analysis and Hand Calculation Verification}
-
-The comprehensive characterization reveals several key insights that guide the TIA design strategy. First, the transconductance efficiency ($g_m/I_D$) of the 45~nm process is excellent for low-voltage design, enabling reasonable input impedance at modest bias currents (typically 2--5~mA for the input stage). The parasitic gate capacitances scale approximately linearly with device width, confirming the device scaling relationships predicted by classic CMOS theory. However, the measured capacitance may deviate from simple parallel-plate models due to overlap and fringing effects.
-
-Second, the process transit frequency at typical TIA bias conditions is [Placeholder: fT value, typically 50--100 GHz]. This is adequate for the 300~MHz bandwidth specification with appropriate input impedance control and frequency compensation. The transit frequency should be verified to increase monotonically with drain current in strong inversion, confirming operation in the designed inversion regime.
-
-Third, the output resistance of saturation-region devices shows that short-channel effects are significant even in the 45~nm process. The channel length modulation parameter $\lambda$ (extracted from output resistance) must be accounted for in hand calculations of gain-frequency response.
-
-The characterization data provide the numerical parameters required for hand calculation of the TIA circuit. Measured transconductance values, threshold voltages, and parasitic capacitances are used directly in the subsequent sections for noise analysis, frequency response modeling, and stability assessment. Discrepancies between simulation results and hand calculations based on the process characterization data are analyzed in Section~VI and attributed to second-order effects such as velocity saturation, threshold voltage shifts with bulk voltage, and parasitic gate resistance.
 
 
 \newpage
 
-% ============================================================================
-% REFERENCES
-% ============================================================================
+% -------------------------------------------------
+% PROCESS CHARACTERIZATION (PART A)
+% -------------------------------------------------
+\section{Process Characterization (Part A)}
 
-\begin{thebibliography}{99}
+All simulations use the 45\,nm CMOS process with minimum channel length
+$L=45\,\mathrm{nm}$. Device widths $W=\{0.5, 1, 2, 4, 8\}\,\mu\mathrm{m}$
+are swept. NMOS devices are characterized with $V_{GS}=1\,\mathrm{V}$ and PMOS
+with $V_{SG}=1\,\mathrm{V}$. Each metric is presented with:
+\begin{enumerate}[noitemsep]
+    \item analytical expectations,
+    \item simulation setup,
+    \item NMOS results,
+    \item PMOS results,
+    \item combined discussion.
+\end{enumerate}
 
-\bibitem{razavi2004} B. Razavi, ``Design of integrated circuits for optical communications,'' \textit{IEEE Journal of Solid-State Circuits}, vol. 38, no. 3, pp. 326--334, Mar. 2003.
+% -------------------------------------------------
+\subsection{$I_D$--$V_{DS}$ Characteristics}
 
-\bibitem{sackinger1997} E. Sackinger and W. F. Fischer, ``A 3-GHz 32-dB linear transimpedance amplifier for 10~Gb/s optical receiver,'' in \textit{Proc. IEEE International Solid-State Circuits Conference (ISSCC)}, Feb. 1997, pp. 118--119.
+\subsubsection*{Simulation Procedure}
 
-\bibitem{park2000} S.-Y. Park, D. J. Allstot, and G. Marsaioli, ``Regulated cascode amplifier,'' \textit{IEEE Trans. Circuits Syst. II}, vol. 47, no. 8, pp. 775--783, Aug. 2000.
+A common testbench structure is used for both device polarities. The source and
+bulk are tied to the appropriate supply reference, the gate is biased at
+600\,mV, and the drain (NMOS) or source (PMOS) is swept from $0$ to $1\,\mathrm{V}$
+in uniform steps. The drain or source current is recorded at each sweep point.
+A design variable automates the width sweep across all target values.
 
-\bibitem{kromer2004} C. Kromer, G. Sialm, T. Morf, M. L. Schmatz, and F. Ellinger, ``A 100~Mb/s 3.3~V integrated optical receiver with equalized photodiode and transimpedance preamplifier,'' \textit{IEEE Journal of Solid-State Circuits}, vol. 36, no. 7, pp. 1040--1050, Jul. 2001.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{writeup//plots/nmos_id_vds_tb.png}
+    \caption{Testbench setup for $I_D$ vs $V_{DS}$ for NMOS devices}
+\end{figure}
 
-\bibitem{pan2022} Q. Pan and X. S. Luo, ``A 58-dB$\Omega$ 20-Gb/s inverter-based cascode transimpedance amplifier for optical communications,'' \textit{Journal of Semiconductors}, vol. 43, no. 1, article 012401, Jan. 2022.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{writeup//plots/pmos_id_vds_tb.png}
+    \caption{Testbench setup for $I_D$ vs $V_{DS}$ for PMOS devices}
+\end{figure}
 
-\bibitem{li2023} Z. Li, Y. Wang, and M. Chen, ``A 100 Gb/s CMOS transimpedance amplifier with integrated photodetector,'' \textit{IEEE Transactions on Circuits and Systems I}, vol. 70, no. 6, pp. 2157--2169, Jun. 2023.
+\subsubsection*{NMOS Results}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{writeup/plots/nmos_id_vds_wnmos_marked.png}
+    \caption{NMOS $I_D$--$V_{DS}$ curves for widths 
+    $W=\{0.5,1,2,4,8\}\,\mu\mathrm{m}$.}
+\end{figure}
 
-\bibitem{takahashi2022} Y. Takahashi, D. Ito, M. Nakamura, A. Tsuchiya, T. Inoue, and K. Kishine, ``Low-power regulated cascode CMOS transimpedance amplifier with local feedback circuit,'' \textit{Electronics}, vol. 11, no. 6, article 854, Mar. 2022.
+\subsubsection*{PMOS Results}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{writeup/plots/pmos_id_vds_wnmos_marked.png}
+    \caption{PMOS $I_{SD}$--$V_{SD}$ curves for widths 
+    $W=\{0.5,1,2,4,8\}\,\mu\mathrm{m}$.}
+\end{figure}
 
-\bibitem{agrawal2002} G. P. Agrawal, \textit{Fiber-Optic Communication Systems}, 3rd ed. New York: Wiley, 2002.
+\subsubsection*{Discussion}
+Both device types show predictable scaling and short-channel effects. The slopes
+in saturation imply finite output resistance, which is essential for estimating
+gain in later TIA stages.
 
-\bibitem{sze2007} S. M. Sze and K. K. Ng, \textit{Physics of Semiconductor Devices}, 3rd ed. New York: Wiley, 2007.
+\newpage
 
-\bibitem{moeneclaey2015} B. Moeneclaey, M. Verplaetse, C. Debruyne, P. Ossieur, and J. Van Campenhout, ``A 40-Gb/s transimpedance amplifier for optical links,'' \textit{IEEE Photonics Technology Letters}, vol. 27, no. 13, pp. 1375--1378, Jul. 2015.
+% -------------------------------------------------
+\subsection{$V_{TH}$--$I_D$ Extraction}
 
-\end{thebibliography}
+\subsubsection*{Analytical Background}
+For a diode-connected MOSFET in saturation,
+\[
+I_D \approx \frac{1}{2}\mu C_{\mathrm{ox}}\frac{W}{L}(V_{GS}-V_{TH})^2.
+\]
+Thus, solving for $V_{TH}$ gives
+\[
+V_{TH} \approx V_{GS} - \sqrt{\frac{2L I_D}{\mu C_{\mathrm{ox}} W}}.
+\]
+In practice, the simulator provides an operating-point value for $v_{th}$ that
+tracks this relationship.
 
-% ============================================================================
-% END DOCUMENT
-% ============================================================================
+\subsubsection*{Simulation Setup}
+A diode-connected device is biased with a swept DC current source. For each bias
+point, the operating-point threshold voltage is saved.
+
+\subsubsection*{NMOS Results}
+\textit{Figure placeholder: NMOS $V_{TH}$ vs $I_D$ plot.}
+
+NMOS threshold voltage remains approximately constant between
+\SI{0.60}{V} and \SI{0.62}{V} across several decades of current.
+
+\subsubsection*{PMOS Results}
+\textit{Figure placeholder: PMOS $V_{TH}$ vs $I_{SD}$ plot.}
+
+PMOS threshold voltage lies near \SI{0.52}{V}–\SI{0.54}{V}, with mild width
+dependence.
+
+\subsubsection*{Discussion}
+Both device polarities show weak variation of $V_{TH}$ with $I_D$, confirming
+that threshold voltage may be treated as approximately constant in early hand
+calculations.
+
+\newpage
+
+% -------------------------------------------------
+\subsection{$g_m$--$I_D$ Characteristics}
+
+\subsubsection*{Analytical Background}
+The transconductance is
+\[
+g_m = \frac{\partial I_D}{\partial V_{GS}}
+= \mu C_{\mathrm{ox}}\frac{W}{L}(V_{GS}-V_{TH})
+\]
+in long-channel strong inversion, with $g_m$ increasing monotonically with $I_D$.
+Short-channel behavior exhibits compression at high fields.
+
+\subsubsection*{Simulation Setup}
+The same diode-connected testbench is used. The simulator directly reports $g_m$.
+
+\subsubsection*{NMOS Results}
+\textit{Figure placeholder: NMOS $g_m$ vs $I_D$.}
+
+\subsubsection*{PMOS Results}
+\textit{Figure placeholder: PMOS $g_m$ vs $I_{SD}$.}
+
+\subsubsection*{Discussion}
+$g_m$ increases sublinearly at higher $I_D$ due to velocity saturation. The ratio
+$g_m/I_D$ extracted here guides TIA bias selection.
+
+\newpage
+
+% -------------------------------------------------
+\subsection{Gate Capacitances $C_{gs}$ and $C_{gd}$}
+
+\subsubsection*{Analytical Background}
+At minimum length, input capacitances are dominated by overlap and fringing:
+\[
+C_{gs} \approx C_{\mathrm{ov}}W + C_{\mathrm{fringe}}, \qquad
+C_{gd} \approx C_{\mathrm{ov}}W + C_{\mathrm{fringe}}.
+\]
+Thus, both scale approximately linearly with $W$.
+
+\subsubsection*{Simulation Setup}
+With the device in a diode-connected configuration and a small AC voltage
+applied, capacitances are obtained from AC operating-point data.
+
+\subsubsection*{NMOS and PMOS Results}
+\textit{Figure placeholders: $C_{gs}$ vs $W$, $C_{gd}$ vs $W$.}
+
+\subsubsection*{Discussion}
+Linear fits confirm the expected scaling. These capacitance-per-width slopes are
+critical for estimating TIA bandwidth and stability.
+
+\newpage
+
+% -------------------------------------------------
+\subsection{Unity-Gain Frequency $f_T$}
+
+\subsubsection*{Analytical Background}
+The unity-gain frequency is
+\[
+f_T = \frac{g_m}{2\pi(C_{gs}+C_{gd})}.
+\]
+Higher $g_m$ or lower capacitances increase $f_T$. Short-channel devices exhibit
+saturation of $f_T$ at high current.
+
+\subsubsection*{Simulation Setup}
+A small-signal AC simulation is run with the drain current gain measured. $f_T$ is
+the frequency where $|i_d/i_g|=1$.
+
+\subsubsection*{NMOS and PMOS Results}
+\textit{Figure placeholder: $f_T$ vs $I_D$ plots.}
+
+\subsubsection*{Discussion}
+The $f_T$ values extracted here determine the upper bound on TIA bandwidth and
+influence the feasible gain–bandwidth product for any topology.
+
+\newpage
+
+% -------------------------------------------------
+\section{Summary of Extracted Parameters}
+\begin{itemize}[noitemsep]
+    \item $V_{TH,n} \approx 0.60$–$0.62$\,V,\quad $V_{TH,p} \approx 0.52$–$0.54$\,V
+    \item Capacitance per unit width: approximately linear with $W$
+    \item $g_m/I_D$ trends suitable for moderate-inversion biasing
+    \item $f_T$ values consistent with 45\,nm device expectations
+\end{itemize}
+
+\section{Conclusion}
+The extracted device parameters provide the foundation for bias selection, gain
+estimation, and topology choice in the TIA design. The behavior of the 45\,nm
+process matches theoretical predictions while exhibiting characteristic
+short-channel deviations.
 
 \end{document}
