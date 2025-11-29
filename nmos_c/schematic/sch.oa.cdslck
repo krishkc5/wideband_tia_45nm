@@ -1,0 +1,16 @@
+#
+# Edit Lock-Stake file. CAUTION: Please do not change.
+#
+# Information about current Edit Lock Owner.
+#
+LockStakeVersion               1.1
+LoginName                      krishkc
+HostName                       big09.seas.upenn.edu
+ProcessIdentifier              22964
+ProcessCreationTime_UTC        1764283544
+ProcessCreationTime_Readable   Thu Nov 27 17:45:44 2025 EST
+AppIdentifier                  OA File System Design Manager
+OSType                         unix
+ReasonForPlacingEditLock       OpenAccess edit lock
+FilePathUsedToEditLock         /lcars/home/k/krishkc/cadenceGPDK/wideband_tia_45nm/nmos_c/schematic/sch.oa.cdslck
+TimeEditLocked                 Thu Nov 27 18:40:47 2025 EST
